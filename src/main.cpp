@@ -76,6 +76,8 @@ int main(int argc, char **argv) {
     sine_lookup.load_lookup_table();
     sine_lookup.debug_print_table();
 
+    std::cout<<sine_lookup.get_sin(359);
+
     // // std::cout << "type: " << opt.type << "\n";
     // std::cout << "alpha: " << opt.alpha << "\n";
     // std::cout << "mod_deg: " << opt.mod_deg << "\n";

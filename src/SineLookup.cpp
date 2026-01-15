@@ -36,8 +36,8 @@ double SineLookup::interpolate(int wanted_angle) {
         return it_upper->second;
     }
 
-    if (it_lower->first>it_upper->first)
-        swap(it_upper, it_lower);
+    // if (it_lower->first>it_upper->first)
+    //     swap(it_upper, it_lower);
 
     int begin_angle=it_lower->first;
     int end_angle=it_upper->first;
@@ -45,10 +45,10 @@ double SineLookup::interpolate(int wanted_angle) {
     double end_value = it_upper->second;
 
     //ako se obilazi krug garantuje nenegativne
-    double delta = end_angle - begin_angle;
-    if (delta <= 0) delta += 360;
-
+    double delta = (end_angle - begin_angle + 360) % 360;
     double t = (wanted_angle - begin_angle + 360) % 360 / delta;
+
+
     double value = begin_value + (end_value - begin_value) * t;
 
     table.insert(std::make_pair(wanted_angle, value));
