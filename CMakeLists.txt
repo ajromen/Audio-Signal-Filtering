@@ -8,6 +8,7 @@ add_executable(Audio_Signal_Filtering
         src/main.cpp
         src/SineLookup.cpp
         include/Filter.h
+        src/Filter.cpp
 )
 
 target_include_directories(Audio_Signal_Filtering

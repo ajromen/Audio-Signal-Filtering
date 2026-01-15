@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <SineLookup.h>
 #include <fstream>
@@ -6,14 +7,71 @@
 #include <stdexcept>
 
 
-double SineLookup::interpolate(int wanted_angle, int begin_angle, int end_angle, double begin_value, double end_value) {
-    //osiguravamo deljenje sa 0
-    if (begin_angle == end_angle) {
-        return begin_value;
+
+/**
+ * Za dati Key interpolate-uje vrednost koristeci prvi manji i prvi veci kluc i vrednost
+ * (ideci u krug ako ih ne nadje) , zapisuje je u tabelu
+ *
+ * @param wanted_angle normalizovan ugao za koji ne postoji vrednost u tabeli
+ * @return interpolate-ovana vrednost
+ */
+double SineLookup::interpolate(int wanted_angle) {
+
+    auto it_upper = table.lower_bound(wanted_angle);
+    auto it_lower = get_first_or_lower(wanted_angle);
+
+
+    //ako ne postoji manji element kruzno sa kraja uzima poslednji
+    if (it_lower == table.end()) {
+        it_lower = std::prev(table.end());
     }
 
-    double t = double(wanted_angle - begin_angle)/ double(end_angle - begin_angle);
-    return begin_value + (end_value - begin_value)*t;
+    // ako ne postoji veci element kruzno sa pocetka uzima prvi
+    if (it_upper == table.end()) {
+        it_upper = table.begin();
+    }
+
+    // ako ne postoje dva elementa izmedju kojih moze da se interpolate-uje
+    if (it_upper == it_lower) {
+        return it_upper->second;
+    }
+
+    if (it_lower->first>it_upper->first)
+        swap(it_upper, it_lower);
+
+    int begin_angle=it_lower->first;
+    int end_angle=it_upper->first;
+    double begin_value = it_lower->second;
+    double end_value = it_upper->second;
+
+    //ako se obilazi krug garantuje nenegativne
+    double delta = end_angle - begin_angle;
+    if (delta <= 0) delta += 360;
+
+    double t = (wanted_angle - begin_angle + 360) % 360 / delta;
+    double value = begin_value + (end_value - begin_value) * t;
+
+    table.insert(std::make_pair(wanted_angle, value));
+    return value;
+}
+
+/**
+ * @param wanted_angle  Key of (key, value) pair to be located.
+ * @return Iterator pointing to the first element <= than key, or begin().
+ */
+std::map<int, double>::iterator SineLookup::get_first_or_lower(int wanted_angle) {
+    if (table.empty()) return table.end();
+
+    auto it = table.lower_bound(wanted_angle);
+    if (it == table.begin()) return std::prev(table.end());
+    if (it == table.end() || it->first > wanted_angle) it--;
+    return it;
+}
+
+void SineLookup::debug_print_table() {
+    for (auto it = table.begin(); it != table.end(); ++it) {
+        std::cout << it->first << ": " << it->second << std::endl;
+    }
 }
 
 int SineLookup::normalise_angle(int angle) {
@@ -24,12 +82,42 @@ int SineLookup::normalise_angle(int angle) {
 
 void SineLookup::load_lookup_table() {
     //postoji li fajl?
-
     if (!std::filesystem::exists(this->file_path)) {
-        throw std::runtime_error("SineLookup::load_lookup_table() File does not exist.");
+        throw std::runtime_error("File does not exist.");
     }
 
     std::ifstream file(this->file_path);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open sine lookup table file.");
+    }
+
+    std::string line;
+
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
+        if (!line.empty() && !isdigit(line[0])) {
+            std::cerr << "Sine Lookup load: Skipping invalid line: " << line << std::endl;
+        }
+
+        std::stringstream ss(line);
+        int key;
+        double value;
+
+        if (!(ss >> key >> value)) {
+            std::cerr << "Sine Lookup load: Skipping invalid line: " << line << std::endl;
+        }
+
+        key = normalise_angle(key);
+        table.insert(std::make_pair(key, value));
+    }
+}
+
+double SineLookup::get_sin(int angle)  {
+    try {
+        return table.at(angle);
+    } catch (const std::out_of_range&) {
+        return interpolate(angle);
+    }
 }
 
 

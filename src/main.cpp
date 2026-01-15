@@ -4,17 +4,19 @@
 
 #include <CLI/CLI.hpp>
 #include <options.h>
+#include <SineLookup.h>
+
 
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
+
 
 Options parse_options(int argc, char **argv) {
     Options opt;
 
     CLI::App app{"Audio Signal Filtering"};
 
-    // Defaults
     std::string type_str = "lowpass";
     opt.alpha = 0.15;
     opt.mod_deg = 5;
@@ -22,7 +24,6 @@ Options parse_options(int argc, char **argv) {
     opt.sine   = "data/sine_table.txt";
     opt.out    = "output.wav";
 
-    // CLI options
     app.add_option("--type", type_str,
                    "Filter type: lowpass | highpass | bandpass")
         ->check(CLI::IsMember({"lowpass", "highpass", "bandpass"}));
@@ -39,24 +40,22 @@ Options parse_options(int argc, char **argv) {
 
     app.add_option("--out", opt.out, "Output WAV file");
 
-    // Parse FIRST
     try {
         app.parse(argc, argv);
     } catch (const CLI::ParseError &e) {
         std::exit(app.exit(e));
     }
 
-    // Convert type string → enum
     if (type_str == "lowpass")       opt.type = FilterType::LowPass;
     else if (type_str == "highpass") opt.type = FilterType::HighPass;
     else if (type_str == "bandpass") opt.type = FilterType::BandPass;
 
-    // Resolve paths relative to CURRENT WORKING DIRECTORY
+
     opt.signal = std::filesystem::absolute(opt.signal).string();
     opt.sine   = std::filesystem::absolute(opt.sine).string();
     opt.out    = std::filesystem::absolute(opt.out).string();
 
-    // Validate files
+
     if (!std::filesystem::exists(opt.signal)) {
         std::cout << opt.signal;
         throw std::runtime_error("Signal file not found: " + opt.signal);
@@ -73,10 +72,14 @@ Options parse_options(int argc, char **argv) {
 int main(int argc, char **argv) {
     Options opt = parse_options(argc, argv);
 
-    // std::cout << "type: " << opt.type << "\n";
-    std::cout << "alpha: " << opt.alpha << "\n";
-    std::cout << "mod_deg: " << opt.mod_deg << "\n";
-    std::cout << "signal: " << opt.signal << "\n";
-    std::cout << "sine: " << opt.sine << "\n";
-    std::cout << "out: " << opt.out << "\n";
+    SineLookup sine_lookup(opt.sine);
+    sine_lookup.load_lookup_table();
+    sine_lookup.debug_print_table();
+
+    // // std::cout << "type: " << opt.type << "\n";
+    // std::cout << "alpha: " << opt.alpha << "\n";
+    // std::cout << "mod_deg: " << opt.mod_deg << "\n";
+    // std::cout << "signal: " << opt.signal << "\n";
+    // std::cout << "sine: " << opt.sine << "\n";
+    // std::cout << "out: " << opt.out << "\n";
 }

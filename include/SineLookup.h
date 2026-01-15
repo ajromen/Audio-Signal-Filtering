@@ -7,17 +7,21 @@ private:
     std::map<int, double> table;
     std::string file_path;
 
-    static double interpolate(int wanted_angle,int begin_angle,int end_angle, double begin_value, double end_value);
+    double interpolate(int wanted_angle);
+
+    std::map<int, double>::iterator get_first_or_lower(int wanted_angle);
 
 public:
     explicit SineLookup(const std::string &file_path) : file_path(file_path) {
     }
 
+    void debug_print_table();
+
     ~SineLookup() = default;
 
     static int normalise_angle(int angle);
 
-    void load_lookup_table() ;
+    void load_lookup_table();
 
     double get_sin(int angle);
 
