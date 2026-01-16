@@ -19,8 +19,7 @@ private:
     void load_lookup_table();
 
 public:
-    explicit SineLookup(const std::string &file_path);
-
+    SineLookup(const std::string &file_path);
 
     void debug_print_table();
 

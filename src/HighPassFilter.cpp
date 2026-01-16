@@ -7,7 +7,7 @@ HighPassFilter::HighPassFilter(double alpha, int mod_deg, SineLookup &sine_looku
 /**
  * Primena IIR high-pass filtera prvog reda
  *
- * @param input vektor<double> vrednosti ulaznog signala za konvertovanje
+ * @param input vеctor<double> vrednosti ulaznog signala za konvertovanje
  * @return vector<double> procesovanih sample-ova
  */
 std::vector<double> HighPassFilter::process(const std::vector<double> &input) {
