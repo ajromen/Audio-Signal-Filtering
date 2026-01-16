@@ -110,12 +110,19 @@ void SineLookup::load_lookup_table() {
         key = normalise_angle(key);
         table.insert(std::make_pair(key, value));
     }
+
+    file.close();
+}
+
+SineLookup::SineLookup(const std::string &file_path) {
+    this->file_path=file_path;
+    load_lookup_table();
 }
 
 double SineLookup::get_sin(int angle)  {
     try {
         return table.at(angle);
-    } catch (const std::out_of_range&) {
+    } catch (std::out_of_range&) {
         return interpolate(angle);
     }
 }

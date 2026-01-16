@@ -5,11 +5,17 @@
 #include <CLI/CLI.hpp>
 #include <options.h>
 #include <SineLookup.h>
+#include <Filter.h>
+#include <BandPassFilter.h>
+#include <HighPassFilter.h>
+#include <WavWriter.h>
 
 
 #include <filesystem>
-#include <iostream>
 #include <stdexcept>
+
+#include <LowPassFilter.h>
+
 
 
 Options parse_options(int argc, char **argv) {
@@ -68,20 +74,57 @@ Options parse_options(int argc, char **argv) {
     return opt;
 }
 
+/**
+ *
+ * @param file_path relative or absolute path to input file
+ * @return vector of normalized values
+ */
+std::vector<double> loadSignal(const std::string& file_path) {
+    std::vector<double> signal;
+
+    std::ifstream file(file_path);
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Signal load: Could not open file: " + file_path);
+    }
+
+    std::string value;
+
+    double sample;
+    while (file >> value) {
+        try {
+            sample = std::stod(value);
+        } catch (std::exception &e) {
+            std::cerr << "Signal load: Skipping invalid value: " << value << std::endl;
+            continue;
+        }
+        signal.push_back(sample);
+    }
+
+    file.close();
+
+    return signal;
+}
 
 int main(int argc, char **argv) {
     Options opt = parse_options(argc, argv);
 
     SineLookup sine_lookup(opt.sine);
-    sine_lookup.load_lookup_table();
-    sine_lookup.debug_print_table();
 
-    std::cout<<sine_lookup.get_sin(359);
+    std::vector<double> signal = loadSignal(opt.signal);
 
-    // // std::cout << "type: " << opt.type << "\n";
-    // std::cout << "alpha: " << opt.alpha << "\n";
-    // std::cout << "mod_deg: " << opt.mod_deg << "\n";
-    // std::cout << "signal: " << opt.signal << "\n";
-    // std::cout << "sine: " << opt.sine << "\n";
-    // std::cout << "out: " << opt.out << "\n";
+    Filter* filter;
+    if (opt.type == FilterType::LowPass) {
+        filter =  new LowPassFilter(opt.alpha, opt.mod_deg, sine_lookup);
+    }
+    else if (opt.type == FilterType::HighPass) {
+        filter =  new HighPassFilter(opt.alpha, opt.mod_deg, sine_lookup);
+    }
+    else {
+        filter =  new BandPassFilter(opt.alpha, opt.mod_deg, sine_lookup);
+    }
+
+    const std::vector<double> processed_signal = filter->process(signal);
+
+    WavWriter::write(opt.out, processed_signal);
 }

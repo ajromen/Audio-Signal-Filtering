@@ -11,17 +11,17 @@ private:
 
     std::map<int, double>::iterator get_first_or_lower(int wanted_angle);
 
+    void load_lookup_table();
+
 public:
-    explicit SineLookup(const std::string &file_path) : file_path(file_path) {
-    }
+    explicit SineLookup(const std::string &file_path);
+
 
     void debug_print_table();
 
     ~SineLookup() = default;
 
     static int normalise_angle(int angle);
-
-    void load_lookup_table();
 
     double get_sin(int angle);
 
