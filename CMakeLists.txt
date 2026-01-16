@@ -14,7 +14,6 @@ add_executable(Audio_Signal_Filtering
         src/WavWriter.cpp
         src/Options.cpp
         src/Signal.cpp
-        include/tests.h
         src/tests.cpp
 )
 
