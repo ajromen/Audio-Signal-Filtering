@@ -41,5 +41,8 @@
 *.dwo
 
 output.wav
-.idea/
+.idea/*
 cmake-build-debug/
+.idea
+*.xml
+.idea/vcs.xml

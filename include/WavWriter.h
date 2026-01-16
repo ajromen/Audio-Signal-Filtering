@@ -3,6 +3,11 @@
 #include <vector>
 #include <string>
 
+
+
+/**
+ * Staticka klasa koja sluzi za zapisivanje niza sample-a u WAV format
+ */
 class WavWriter {
 private:
     static constexpr int BITS_PER_SAMPLE = 16;

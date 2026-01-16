@@ -2,6 +2,11 @@
 #include <map>
 #include <string>
 
+
+
+/**
+ * Klasa koja sluzi za ucitavanje, interpolate-ovanje i dobijanje sinusoide
+ */
 class SineLookup {
 private:
     std::map<int, double> table;

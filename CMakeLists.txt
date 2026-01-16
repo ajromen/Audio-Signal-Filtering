@@ -12,6 +12,10 @@ add_executable(Audio_Signal_Filtering
         src/HighPassFilter.cpp
         src/BandPassFilter.cpp
         src/WavWriter.cpp
+        src/Options.cpp
+        src/Signal.cpp
+        include/tests.h
+        src/tests.cpp
 )
 
 target_include_directories(Audio_Signal_Filtering
@@ -19,3 +23,9 @@ target_include_directories(Audio_Signal_Filtering
         ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/external/CLI11/include
 )
+
+option(TEST_MODE "Enable internal tests" OFF)
+
+if(TEST_MODE)
+    add_compile_definitions(TEST_MODE)
+endif()

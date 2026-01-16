@@ -68,18 +68,31 @@ std::map<int, double>::iterator SineLookup::get_first_or_lower(int wanted_angle)
     return it;
 }
 
+
+/**
+ * Ispisuje sadrzaj lookup tabele
+ */
 void SineLookup::debug_print_table() {
     for (auto it = table.begin(); it != table.end(); ++it) {
         std::cout << it->first << ": " << it->second << std::endl;
     }
 }
 
+/**
+ * Normalizuje ugao
+ *
+ * @param angle nenormalizovani ugao
+ * @return normalizovani ugao u rasponu od 0 do 359
+ */
 int SineLookup::normalise_angle(int angle) {
     angle %= 360;
     if (angle < 0) angle += 360;
     return angle;
 }
 
+/**
+ * Ucitava lookup tabelu za sinus iz ulaznog fajla
+ */
 void SineLookup::load_lookup_table() {
     //postoji li fajl?
     if (!std::filesystem::exists(this->file_path)) {
@@ -112,13 +125,30 @@ void SineLookup::load_lookup_table() {
     }
 
     file.close();
+
+
+    // ako je tabela prazna ne sme se nastaviti program
+    if (table.empty() || table.size()<2) {
+        throw std::runtime_error("Sine Lookup load: Lookup table too small.");
+    }
 }
 
+/**
+ *
+ * @param file_path ulazni fajl za lookup tabelu
+ */
 SineLookup::SineLookup(const std::string &file_path) {
     this->file_path=file_path;
     load_lookup_table();
 }
 
+
+/**
+ * Vraca datu ili interpolate-ovanu vrednost sinusa
+ *
+ * @param angle vec normalizovani ugao
+ * @return vrednost sinusa za dati ugao
+ */
 double SineLookup::get_sin(int angle)  {
     try {
         return table.at(angle);

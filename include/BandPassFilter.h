@@ -3,6 +3,9 @@
 #include "LowPassFilter.h"
 #include "HighPassFilter.h"
 
+/**
+ * Nasledjuje abstraktnu klasu Filter i sluzi za vrsenje BandPass filtera za zadati signal
+ */
 class BandPassFilter : public Filter {
 public:
     BandPassFilter(double alpha, int modDeg, SineLookup& sineLookup);
