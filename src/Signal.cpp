@@ -4,6 +4,7 @@
 #include <limits>
 #include <Signal.hpp>
 #include <string>
+#include <utility>
 
 /**
  *
@@ -43,5 +44,9 @@ void Signal::load_data() {
                   << MAX_SAMPLES;
         data.resize(MAX_SAMPLES);
     }
+}
+
+Signal::Signal(std::string file_path):file_path(std::move(file_path)) {
+    this->load_data();
 }
 

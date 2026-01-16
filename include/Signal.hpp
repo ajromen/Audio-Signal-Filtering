@@ -14,7 +14,7 @@ private:
 public:
     void load_data();
 
-    Signal(const std::string& file_path):file_path(file_path){};
+    Signal(std::string  file_path);
     Signal(const std::vector<double>& data):data(data){};
 
     std::vector<double> get_data();
