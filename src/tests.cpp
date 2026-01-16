@@ -6,7 +6,7 @@
 #include "HighPassFilter.h"
 
 static void test_sine_lookup() {
-    SineLookup sl("sine_test.txt");
+    SineLookup sl("data/sine_test.txt");
 
     sl.debug_print_table();
     std::cout << "[TEST] sin(90): " << sl.get_sin(90);
@@ -15,7 +15,7 @@ static void test_sine_lookup() {
 }
 
 static void test_lowpass() {
-    SineLookup sl("sine_table.txt");
+    SineLookup sl("data/sine_table.txt");
 
     std::vector<double> step = {0,0,0,1,1,1};
     LowPassFilter lp(0.1, 1, sl);
@@ -27,7 +27,7 @@ static void test_lowpass() {
 }
 
 static void test_highpass() {
-    SineLookup sl("sine_table.txt");
+    SineLookup sl("data/sine_table.txt");
 
     std::vector<double> dc = {1,1,1,1,1};
     HighPassFilter hp(0.1, 1, sl);
@@ -41,7 +41,7 @@ static void test_highpass() {
 static void test_modulation_range() {
     std::cout << "\n[TEST] Modulation range\n";
 
-    SineLookup sl("sine_table.txt");
+    SineLookup sl("data/sine_table.txt");
     LowPassFilter lp(0.2, 10, sl);
 
     for (int i = 0; i < 20; ++i) {
@@ -56,7 +56,7 @@ static void test_modulation_range() {
 
 
 void run_tests() {
-    std::cout << "=== Running internal tests ===\n";
+    std::cout << "TEST MODE\n";
     test_sine_lookup();
     test_lowpass();
     test_highpass();
