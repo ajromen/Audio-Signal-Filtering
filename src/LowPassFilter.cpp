@@ -13,7 +13,6 @@ std::vector<double> LowPassFilter::process(const std::vector<double> &input) {
 
     output[0]=input[0];
 
-    // TODO Osiguraj da fajl nema preko int sample-va
     for (size_t i=1; i<input.size(); i++) {
         double m = this->compute_modulation(i);
         output[i] = output[i-1] + alpha * (m * input[i] - output[i-1]);

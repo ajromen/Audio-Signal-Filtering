@@ -26,7 +26,7 @@ Options Options::parse_options(int argc, char **argv) {
         ->check(CLI::Range(0.0, 1.0));
 
     app.add_option("--mod_deg", opt.mod_deg, "Modulation degree")
-        ->check(CLI::PositiveNumber);
+        ->check(CLI::PositiveNumber)->check(CLI::Range(1, 360));
 
     app.add_option("--signal", opt.signal, "Input signal file");
 
@@ -44,6 +44,9 @@ Options Options::parse_options(int argc, char **argv) {
     if (type_str == "lowpass")       opt.type = FilterType::LowPass;
     else if (type_str == "highpass") opt.type = FilterType::HighPass;
     else if (type_str == "bandpass") opt.type = FilterType::BandPass;
+    else {
+        throw std::runtime_error("Invalid filter type");
+    }
 
 
     // postavlja apsolutne adrese
@@ -61,6 +64,11 @@ Options Options::parse_options(int argc, char **argv) {
     if (!std::filesystem::exists(opt.sine)) {
         throw std::runtime_error("Sine table file not found: " + opt.sine);
     }
+
+    if (opt.out.empty()) {
+        throw std::runtime_error("Output file path is empty");
+    }
+
 
     return opt;
 }

@@ -1,10 +1,11 @@
 
 #include <fstream>
 #include <iostream>
-#include <limits>
 #include <Signal.hpp>
 #include <string>
 #include <utility>
+#include <cmath>
+
 
 /**
  *
@@ -30,8 +31,17 @@ void Signal::load_data() {
     while (file >> value) {
         try {
             sample = std::stod(value);
+
+            if (!std::isfinite(sample)) {
+                std::cerr << "Signal load: Skipping invalid value: " << value << std::endl;
+                continue;
+            }
         } catch (std::exception &e) {
             std::cerr << "Signal load: Skipping invalid value: " << value << std::endl;
+            continue;
+        }
+        if (sample < -1.0 || sample > 1.0) {
+            std::cerr << "Signal load: Skipping out-of-range sample: " << sample << std::endl;
             continue;
         }
         data.push_back(sample);
@@ -43,6 +53,10 @@ void Signal::load_data() {
         std::cerr << "Warning: Signal has more samples than supported. Truncating to "
                   << MAX_SAMPLES;
         data.resize(MAX_SAMPLES);
+    }
+
+    if (data.empty()) {
+        throw std::runtime_error("Signal load: No valid samples loaded");
     }
 }
 

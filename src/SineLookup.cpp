@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
 
 
 
@@ -46,10 +47,20 @@ double SineLookup::interpolate(int wanted_angle) {
 
     //ako se obilazi krug garantuje nenegativne
     double delta = (end_angle - begin_angle + 360) % 360;
+
+    if (delta == 0) {
+        throw std::runtime_error("Sine interpolate: zero angle delta");
+    }
+
     double t = (wanted_angle - begin_angle + 360) % 360 / delta;
 
 
+
     double value = begin_value + (end_value - begin_value) * t;
+
+    if (!std::isfinite(value) || value < -1.0 || value > 1.0) {
+        throw std::runtime_error("Interpolated sine value out of range");
+    }
 
     table.insert(std::make_pair(wanted_angle, value));
     return value;
@@ -120,8 +131,20 @@ void SineLookup::load_lookup_table() {
             std::cerr << "Sine Lookup load: Skipping invalid line: " << line << std::endl;
         }
 
+        if (!std::isfinite(value) || value < -1.0 || value > 1.0) {
+            throw std::runtime_error("Invalid sine value (must be in [-1,1])");
+        }
+
+
         key = normalise_angle(key);
+
+        if (table.contains(key)) {
+            std::cerr<<"Duplicate sine angle detected skipping line. key: "<<key<<std::endl;
+            continue;
+        }
+
         table.insert(std::make_pair(key, value));
+
     }
 
     file.close();

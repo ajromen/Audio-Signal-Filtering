@@ -39,8 +39,12 @@ int main(int argc, char **argv) {
 
     // procesujemo signal
     Signal processed_signal = filter->process(signal.get_data());
+    delete filter;
+
 
     // konvertujemo u wav format i upisujemo u opt.out file
     WavWriter::write(opt.out, processed_signal.get_data());
+
+    return 0;
 }
 #endif

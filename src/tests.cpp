@@ -1,5 +1,6 @@
 #include "tests.h"
 
+#include <cassert>
 #include <iostream>
 #include "SineLookup.h"
 #include "LowPassFilter.h"
@@ -11,7 +12,7 @@ static void test_sine_lookup() {
     sl.debug_print_table();
     std::cout << "[TEST] sin(90): " << sl.get_sin(90);
     std::cout << "[TEST] sin(45): " << sl.get_sin(45);
-    std::cout << "[TEST] sin(-359): " << sl.get_sin(SineLookup::normalise_angle(-1));
+    std::cout << "[TEST] sin(-1): " << sl.get_sin(SineLookup::normalise_angle(-1));
 }
 
 static void test_lowpass() {
@@ -24,6 +25,12 @@ static void test_lowpass() {
     std::cout << "[TEST] Low-pass output:\n";
     for (double v : out) std::cout << v << " ";
     std::cout << "\n";
+
+    for (size_t i = 1; i < out.size(); ++i) {
+        assert(out[i] >= out[i - 1]);
+        assert(out[i] <= 1.0);
+    }
+
 }
 
 static void test_highpass() {
@@ -36,6 +43,10 @@ static void test_highpass() {
     std::cout << "[TEST] High-pass output:\n";
     for (double v : out) std::cout << v << " ";
     std::cout << "\n";
+
+    for (double v : out) {
+        assert(std::abs(v) < 1e-6);
+    }
 }
 
 static void test_modulation_range() {
