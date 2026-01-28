@@ -3,6 +3,7 @@
 #include <Filter.h>
 #include <BandPassFilter.h>
 #include <HighPassFilter.h>
+#include <iostream>
 #include <WavWriter.h>
 #include <LowPassFilter.h>
 #include <Signal.hpp>
@@ -44,6 +45,7 @@ int main(int argc, char **argv) {
 
     // konvertujemo u wav format i upisujemo u opt.out file
     WavWriter::write(opt.out, processed_signal.get_data());
+    std::cout << "Successfully written to: " << opt.out << std::endl;
 
     return 0;
 }
